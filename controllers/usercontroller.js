@@ -37,21 +37,27 @@ const createUser = (req,res)=>{
 }
 
 const userList = async (req,res)=>{
-    let allUser = await User.findAll({ 
-        include: [{
-            model : UserImage,
-            as:"userImages", 
-            attributes : ['image','img_name','userId','id'],
-        }]
-     });
-    // console.log(allUser);
-    res.render("userList",{result : allUser});
-    // res.json(allUser); 
+    try{
+        let allUser = await User.findAll({ 
+            include: [{
+                model : UserImage,
+                as:"userImages", 
+                attributes : ['image','img_name','userId','id'],
+            }]
+         });
+        // console.log(allUser);
+        res.render("userList",{result : allUser});
+        // res.json(allUser); 
+
+    }catch(err){
+        console.err
+    }
 }
 
 const userDetail = async (req,res)=>{
-    let id = req.params.id;
-    let singleUser = await User.findByPk( id,{ 
+    try{
+        let id = req.params.id;
+        let singleUser = await User.findByPk( id,{ 
         include: [{
             model : UserImage,
             as:"userImages", 
@@ -61,6 +67,10 @@ const userDetail = async (req,res)=>{
     // console.log(singleUser);
     res.render("userDetails",{ result : singleUser}); 
     // res.json(singleUser);
+
+    }catch(err){
+        console.log(err);
+    }
 }
 
 const about = (req,res)=>{ 
@@ -68,8 +78,9 @@ const about = (req,res)=>{
 }
 
 const userEditPage = async (req,res)=>{
-    let id = req.params.id;
-    let singleUser = await User.findByPk( id,{ 
+    try{
+        let id = req.params.id;
+        let singleUser = await User.findByPk( id,{ 
         include: [{
             model : UserImage,
             as:"userImages", 
@@ -78,25 +89,30 @@ const userEditPage = async (req,res)=>{
      });
     // res.json(singleUser);
     res.render("editUser",{result:singleUser}); 
+
+    }catch(err){
+        console.log(err);
+    }
+    
 }
 
 const userEdit = async (req,res)=>{
-    console.log("user id :" + req.body.userId);
-    console.log("userName :",req.body.userName);
-    console.log("user selected images :" + req.body.selected_img);
-  
-    let newImage = "http://127.0.0.1:3000/public/images/"+req.files[0].filename;
-    // console.log("new image name :", newImage);
-    let id = req.body.userId;
-    let editUserName = await User.update({userName:req.body.userName},{
-        where :{id}
-    });
-    let editImage = await UserImage.update({image : newImage},{
+    try{
+        let newImage = "http://127.0.0.1:3000/public/images/"+req.files[0].filename;
+        // console.log("new image name :", newImage);
+        let id = req.body.userId;
+        let editUserName = await User.update({userName:req.body.userName},{
+            where :{id}
+        });
+        let editImage = await UserImage.update({image : newImage},{
         where:{
             image : req.body.selected_img,
         }
     });
       res.redirect("/userList");
+    }catch(err){
+        console.log(err);
+    }
 }
 
 const userDelete = async (req,res)=>{ 
@@ -113,12 +129,17 @@ const userDelete = async (req,res)=>{
 }
 
 const imgDelete = async (req,res)=>{
-    let singleImg_delete = await UserImage.destroy({
-        where:{
-            image : req.body.data
-        }
-    })
-    res.json({ redirect: "/userList" });
+    try{
+        let singleImg_delete = await UserImage.destroy({
+            where:{
+                image : req.body.data
+            }
+        })
+        res.json({ redirect: "/userList" });
+
+    }catch(err){
+       console.log(err);
+    }
 }
 
 
@@ -132,4 +153,4 @@ module.exports = {
     userEditPage,
     userEdit,
     imgDelete,
-}
+};
